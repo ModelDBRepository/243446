@@ -1,0 +1,167 @@
+// present version
+load_file("nrngui.hoc")
+
+Default_Eleak = -65
+membranecap = 0.64      	/* specific membrane capacitance in uF cm^-2 */
+membraneresist = 120236 	/* specific membrane resistance in ohm cm^2 */
+axialresist = 120	     	/* axial resistivity in ohm cm */
+
+	xopen("Purkinje19b972-1.nrn")	// Load the morphology file.
+	forsec "axon" delete_section()	// Delete original axon and add a fake AIS
+
+objref g2, b2,c2, distrx, distry, cdistry, p
+
+	forall {
+		insert pas e_pas=Default_Eleak	/* Insert Leak everywhere */
+	    insert hpkj	// Ih inserted everywhere
+		insert ds
+		insert pk
+	}
+
+    AIS {  g_pas=1/membraneresist Ra=axialresist cm=membranecap}
+	forsec spinydend {g_pas=5.3/membraneresist Ra=axialresist cm=5.3*membranecap}
+    forsec maindend {g_pas=1.2/membraneresist Ra=axialresist cm=1.2*membranecap}
+	forsec "soma" { g_pas=1/membraneresist Ra=axialresist cm=membranecap}
+
+forsec maindend {insert cdp4N}
+forsec alldend {
+    insert Kv3
+    gbar_Kv3 = 0.4536/2/1.5
+    vshift_Kv3 = 4
+    insert newCaP
+    pcabar_newCaP = 0.95e-4*2
+    vshift_newCaP =-5
+    insert CaT3_1
+    pcabar_CaT3_1 = 5.4e-6*5
+
+    insert mslo
+    gbar_mslo = 0.2688*0.4*2
+    insert SK2
+    gkbar_SK2 = 2.4000e-04*1.5
+    scal_SK2 = 1.0
+    ghbar_hpkj = 3.6e-4*0.6
+	insert Kv1
+	gbar_Kv1 = 0.002
+	insert Kv4
+	 gbar_Kv4 = 0.012*3*0.7
+    insert Kv4s
+    gbar_Kv4s = 0.015
+
+}
+forsec spinydend {
+	insert cdp4Nsp
+    gkbar_SK2 = 2.4000e-04*1.5
+    
+    scal_SK2 = 1.0
+gbar_Kv4 = 0.012*2.2
+    gbar_Kv4s = 0.015
+    ghbar_hpkj = 3.6e-4*0.9
+    vshift_Kv4 = 0
+    gbar_Kv1 = 0.001
+    gbar_Kv3 =0.1512*1.5
+    vshift_Kv3 = 4
+    pcabar_CaT3_1 = 5.4e-5*2
+    pcabar_newCaP = 0.95e-4*2*4
+    vshift_newCaP = -5
+    scale_cdp4Nsp = 3.5
+    gbar_mslo = 0.0448
+}
+
+
+somaA distance(0,1)
+access somaA
+
+forsec "soma" {	
+	insert naRsg
+	gbar_naRsg =0.024*1.2*1.1
+	vshifta_naRsg = 0
+    vshiftk_naRsg = 0
+    vshifti_naRsg = -5
+    
+	insert nap
+	gbar_nap = 0.0001*2*0.7
+	insert pk
+	ena = 63
+    ghbar_hpkj = 3.6e-4*0.3
+
+    insert cdp20N_FD2
+
+    insert Kv3
+    gbar_Kv3 =0.3*0.75*2*2*2
+    vshift_Kv3 = 4
+    insert newCaP
+    pcabar_newCaP = 0.95e-4*2
+    kt_newCaP = 1
+    vshift_newCaP = -5
+    insert mslo
+    gbar_mslo = 0.8736
+    insert abBK
+    gabkbar_abBK = 0.3
+    insert SK2
+    gkbar_SK2 = 0.015/3*1.5
+}
+
+AIS {
+    	insert naRsg
+	gbar_naRsg = 0.8*0.7
+	vshifta_naRsg = 15
+	vshiftk_naRsg = 5
+   vshifti_naRsg = -5
+	insert nap
+	gbar_nap = 0.0023
+	insert CaT3_1
+	pcabar_CaT3_1 = 6.4e-5*2
+	ena = 63
+    ghbar_hpkj = 3.6e-4*0.3
+   insert cdpAIS
+
+    insert Kv3
+    gbar_Kv3 =0.3*6*2*2*2*4*2
+    vshift_Kv3 = 4
+    insert newCaP
+    pcabar_newCaP = 0.95e-4*24
+    kt_newCaP = 1
+    vshift_newCaP = -5
+    insert mslo
+    gbar_mslo = 3*2
+    insert abBK
+    gabkbar_abBK = 1.5*0.7
+    insert SK2
+    gkbar_SK2 = 0.02/1.8*2.5
+}
+
+access somaA
+
+xopen("dendv_arnd21.ses")
+
+celsius = 34
+dt = 0.02
+steps_per_ms = 1/dt
+dtsim = 0.02
+
+xopen ("electrode.hoc")
+xopen("distri.hoc")
+
+stim1.amp =1.06*0
+stim1.del = 200-200
+stim1.dur =50000000000000
+v_init = -65-3
+
+// simple spike energy consumtion
+
+tstop = 500
+cfstart = 400
+
+finitialize(v_init)
+
+for i=0,synlist.count()-1 {
+    synlist.object(i).onset = cfstart
+    synlist.object(i).gmax = 1.2251821e-3
+    synlist.object(i).tau0 = 0.3
+    synlist.object(i).tau1 = 3
+}
+
+startsw()
+continuerun(tstop)		// This is "run()" without the "init()"
+stopsw()
+

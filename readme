@@ -1,0 +1,19 @@
+This model is from the following paper:
+
+Yunliang Zang, Stéphane Dieudonné& Erik De Schutter. Voltage- and Branch-specific Climbing Fiber Responses in Purkinje Cells. Cell Reports in press.
+
+type the following commands on the terminal to implement the demo code, which generates both simple spikes and complex spikes (at 400 ms)
+
+nrnivmodl mod
+nrngui purkinje_demo.hoc
+
+To get the dissociated PC model, add the following 
+"dendA1_00 disconnect()
+dendA1_01 disconnect()"
+into purkinje_demo.hoc, which only preserves the dendritic trunk. 
+
+To achieve voltage-regulated dendritic and somatic responses, change the values of stim1.amp in Purkinje_demo.hoc
+
+The Na entry ratio is defined as the ratio of total Na+ influx (1 ms before and after spike peak) to the Na+ influx (1 ms before spike peak).
+
+If you need to simulate some properties the present model can't do,please contact zangyl1983@gmail.com. I may know the answer.
