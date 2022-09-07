@@ -93,7 +93,7 @@ ASSIGNED {
 	
 }
 
-CONSTANT { cao = 2	(mM) }
+: CONSTANT { cao = 2	(mM) }
 
 STATE {
 	: ca[0] is equivalent to cai
