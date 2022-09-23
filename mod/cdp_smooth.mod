@@ -78,6 +78,7 @@ ASSIGNED {
 :	ica_pmp_last   (mA/cm2)
 	parea     (um)     : pump area per unit length
 	cai       (mM)
+	cao       (mM)
 	mgi	(mM)	
 	vrat[Nannuli]  (1) : dimensionless
                      : numeric value of vrat[i] equals the volume 
@@ -85,8 +86,6 @@ ASSIGNED {
                      : multiply by diam^2 to get volume per um length
 	
 }
-
-CONSTANT { cao = 2	(mM) }
 
 STATE {
 	: ca[0] is equivalent to cai
